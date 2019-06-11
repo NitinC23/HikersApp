@@ -1,6 +1,7 @@
 package com.example.hikersapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     LocationListener locationListener;
-
+    @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -36,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
     public void startListening(){
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if(location !=null){
+                updateLocationInfo(location);
+            }
         }
     }
     public void updateLocationInfo(Location location){
@@ -109,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             }else{
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,locationListener);
-                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 if(lastKnownLocation != null){
                     updateLocationInfo(lastKnownLocation);
                 }
